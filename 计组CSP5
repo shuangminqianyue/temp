@@ -1,0 +1,346 @@
+#include<bits/stdc++.h>
+using namespace std;
+const int N=200005;
+struct Tre{
+    int l,r,id,a,e,eid;
+    int tagid,taga,tage,tageid;
+}t[N*50];
+int rt=0,cnt=0,n,m,k,rd[N][5],jk[N*8];
+void down(int u){
+    int &ls=t[u].l;
+    int &rs=t[u].r;
+    if (ls==0){
+        ls=++cnt;
+        t[ls].e=0; t[ls].id=t[ls].eid=0;
+        t[ls].taga=t[ls].tage=t[ls].tagid=-1;
+        t[ls].taga=-19260817;
+    }
+    if (rs==0){
+        rs=++cnt;
+        t[rs].e=0; t[rs].id=t[rs].eid=0;
+        t[rs].taga=t[rs].tage=t[rs].tagid=-1;
+        t[rs].taga=-19260817;
+    }
+    if (t[u].tagid!=-1){
+        int id=t[u].tagid;
+        t[ls].id=t[ls].eid=id;
+        t[rs].id=t[rs].eid=id;
+        t[ls].tagid=t[rs].tagid=id;
+        t[u].tagid=-1;
+    }
+    if (t[u].tageid!=-1){
+        int id=t[u].tageid;
+        t[ls].eid=t[ls].eid=id;
+        t[rs].eid=t[rs].eid=id;
+        t[ls].tageid=t[rs].tageid=id;
+        t[u].tageid=-1;
+    }
+    if (t[u].tage!=-1){
+        int e=t[u].tage;
+        t[ls].e=t[rs].e=e;
+        t[ls].tage=t[rs].tage=e;
+        t[u].tage=-1;
+    }
+    if (t[u].taga!=-19260817){
+        int a=t[u].taga;
+        t[ls].a=t[rs].a=a;
+        t[ls].taga=t[rs].taga=a;
+        t[u].taga=-19260817;
+    }
+    
+}
+void update(int u){
+    int &ls=t[u].l;
+    int &rs=t[u].r;
+    if (ls==0){
+        ls=++cnt;
+        t[ls].e=0; t[ls].id=t[ls].eid=0;
+        t[ls].taga=t[ls].tage=t[ls].tagid=t[ls].tageid=-1;
+        t[ls].taga=-19260817;
+    }
+    if (rs==0){
+        rs=++cnt;
+        t[rs].e=0; t[rs].id=t[rs].eid=0;
+        t[rs].taga=t[rs].tage=t[rs].tagid=t[rs].tageid=-1;
+        t[rs].taga=-19260817;
+    }
+    if (t[ls].a==t[rs].a) t[u].a=t[ls].a; else t[u].a=-19260817;
+    if (t[ls].e==t[rs].e) t[u].e=t[ls].e; else t[u].e=-1;
+    if (t[ls].id==t[rs].id) t[u].id=t[ls].id; else t[u].id=-1;
+    if (t[ls].eid==t[rs].eid) t[u].eid=t[ls].eid; 
+       else {
+       if ((t[ls].eid==0)||(t[rs].eid==0)) t[u].eid=t[ls].eid+t[rs].eid;
+       else t[u].eid=-1;
+    }
+}
+int geteid(int &u,int l,int r,int ul,int ur){
+    if (u) down(u);
+    if (u==0){
+        u=++cnt;
+        t[u].e=0; t[u].id=t[u].eid=0;
+        t[u].taga=t[u].tage=t[u].tagid=t[u].tageid=-1;
+        t[u].taga=-19260817;
+    }
+    int mid=(l+r)>>1;
+    if (ul<=l&&r<=ur) return t[u].eid;
+    int pl=-1,pr=-1;
+    if (ul<=mid) pl=geteid(t[u].l,l,mid,ul,ur);
+    if (ur>mid) pr=geteid(t[u].r,mid+1,r,ul,ur);
+    update(u);
+    if (ul>mid) return pr;
+    if (ur<=mid) return pl; 
+    if (pl==pr) return pl;
+    if ((pl==0)||(pr==0)) return pl+pr;
+    return -1;
+}
+
+
+void modify(int &u,int l,int r,int ul,int ur,int id,int x){
+    if (u) down(u);
+    if (u==0){
+        u=++cnt;
+        t[u].e=0; t[u].id=t[u].eid=0;
+        t[u].taga=t[u].tage=t[u].tagid=t[u].tageid=-1;
+        t[u].taga=-19260817;
+    }
+    int mid=(l+r)>>1;
+    if (ul<=l&&r<=ur){
+        t[u].eid=t[u].id=id;
+        t[u].a=x; t[u].e=1;
+        t[u].tagid=t[u].tageid=id;
+        t[u].tage=1; t[u].taga=x;
+        return;
+    }
+    if (ul<=mid) modify(t[u].l,l,mid,ul,ur,id,x);
+    if (ur>mid) modify(t[u].r,mid+1,r,ul,ur,id,x);
+    update(u);
+}
+int getid(int &u,int l,int r,int ul,int ur){
+    if (u) down(u);
+    if (u==0){
+        u=++cnt;
+        t[u].e=0; t[u].id=t[u].eid=0;
+        t[u].taga=t[u].tage=t[u].tagid=t[u].tageid=-1;
+        t[u].taga=-19260817;
+    }
+    int mid=(l+r)>>1;
+    if (ul<=l&&r<=ur) return t[u].id;
+    int pl=-1,pr=-1;
+    if (ul<=mid) pl=getid(t[u].l,l,mid,ul,ur);
+    if (ur>mid) pr=getid(t[u].r,mid+1,r,ul,ur);
+    update(u);
+    if (ul>mid) return pr;
+    if (ur<=mid) return pl; 
+    if (pl==pr) return pl;
+    return -1;
+}
+int gete(int &u,int l,int r,int ul,int ur){
+    if (u) down(u);
+    if (u==0){
+        u=++cnt;
+        t[u].e=0; t[u].id=t[u].eid=0;
+        t[u].taga=t[u].tage=t[u].tagid=t[u].tageid=-1;
+        t[u].taga=-19260817;
+    }
+    int mid=(l+r)>>1;
+    if (ul<=l&&r<=ur) return t[u].e;
+    int pl=-1,pr=-1;
+    if (ul<=mid) pl=gete(t[u].l,l,mid,ul,ur);
+    if (ur>mid) pr=gete(t[u].r,mid+1,r,ul,ur);
+    update(u);
+    if (ul>mid) return pr;
+    if (ur<=mid) return pl; 
+    if (pl==pr) return pl;
+    return -1;
+}
+void del(int &u,int l,int r,int ul,int ur){
+    if (u) down(u);
+    if (u==0){
+        u=++cnt;
+        t[u].e=0; t[u].id=t[u].eid=0;
+        t[u].taga=t[u].tage=t[u].tagid=t[u].tageid=-1;
+        t[u].taga=-19260817;
+    }
+    if (ul<=l&&ur>=r){
+        t[u].e=0; t[u].eid=0;
+        t[u].tage=t[u].tageid=0;
+        return;
+    }
+    int mid=(l+r)>>1;
+    if (ul<=mid) del(t[u].l,l,mid,ul,ur);
+    if (ur>mid) del(t[u].r,mid+1,r,ul,ur);
+    update(u);
+    return;
+}
+void reset(int &u,int l,int r,int ul,int ur){
+    if (u) down(u);
+    if (u==0){
+        u=++cnt;
+        t[u].e=0; t[u].id=t[u].eid=0;
+        t[u].taga=t[u].tage=t[u].tagid=t[u].tageid=-1;
+        t[u].taga=-19260817;
+    }
+    if (ul<=l&&ur>=r){
+        t[u].e=1; t[u].eid=t[u].id;
+        t[u].tage=1; t[u].tageid=t[u].eid;
+        return;
+    }
+    int mid=(l+r)>>1;
+    if (ul<=mid) reset(t[u].l,l,mid,ul,ur);
+    if (ur>mid) reset(t[u].r,mid+1,r,ul,ur);
+    update(u);
+    return;
+}
+int query(int &u,int l,int r,int x){
+    if (u) down(u);
+    if (u==0){
+        u=++cnt;
+        t[u].e=0; t[u].id=t[u].eid=0;
+        t[u].taga=t[u].tage=t[u].tagid=t[u].tageid=-1;
+        t[u].taga=-19260817;
+    }
+    if (l==r){
+        if (t[u].e==0) return -19260817;
+        return t[u].a;
+    }
+    int mid=(l+r)>>1;
+    if (x<=mid) return query(t[u].l,l,mid,x); else return query(t[u].r,mid+1,r,x);
+}
+int getr(int ul,int ur,int id){
+    int l=ul,r=ur; int ans=0;
+    while (l<=r){
+        int mid=(l+r)>>1;
+        int eid=geteid(rt,1,m,l,mid);
+        int e=gete(rt,1,m,l,mid);
+        if ((e==0)||((e==1)&&(eid==id))||((e==-1)&&(eid==id||eid==0))) 
+        ans=mid,l=mid+1; 
+        else 
+        r=mid-1;
+    }
+    return ans;
+}
+int main(){
+    scanf("%d%d%d",&k,&m,&n);
+    int gt=0;
+    int tot=0;
+        for (int i=1;i<=n;i++){
+        int opt;
+        scanf("%d",&opt);
+        if (opt==0){
+            int id,l,r,x;
+            rd[i][0]=opt;
+            scanf("%d%d%d%d",&rd[i][1],&rd[i][2],&rd[i][3],&rd[i][4]);
+            jk[++tot]=rd[i][2]; 
+            if (jk[tot]>1) jk[++tot]=rd[i][2]-1;
+            jk[++tot]=rd[i][2]+1;
+            jk[++tot]=rd[i][3];
+            jk[++tot]=rd[i][3]-1;
+            if (jk[tot]<m) jk[++tot]=rd[i][3]+1;
+        }
+        if (opt==1){
+            int id,l,r;
+             rd[i][0]=opt;
+            scanf("%d%d%d",&rd[i][1],&rd[i][2],&rd[i][3]);
+            jk[++tot]=rd[i][2]; 
+            if (jk[tot]>1) jk[++tot]=rd[i][2]-1;
+            jk[++tot]=rd[i][2]+1;
+            jk[++tot]=rd[i][3];
+            jk[++tot]=rd[i][3]-1;
+            if (jk[tot]<m) jk[++tot]=rd[i][3]+1;
+        }
+        if (opt==2){
+            gt++;
+            int id,l,r;
+            rd[i][0]=opt;
+            scanf("%d%d%d",&rd[i][1],&rd[i][2],&rd[i][3]);
+            jk[++tot]=rd[i][2]; 
+            jk[++tot]=rd[i][2]+1;
+            if (jk[tot]>1) jk[++tot]=rd[i][2]-1;
+            jk[++tot]=rd[i][3];
+            jk[++tot]=rd[i][3]-1;
+            if (jk[tot]<m) jk[++tot]=rd[i][3]+1;
+        }
+        if (opt==3){
+            int x;
+            rd[i][0]=opt;
+            scanf("%d",&rd[i][1]);
+            jk[++tot]=rd[i][1];
+            if (jk[tot]>1) jk[++tot]=rd[i][1]-1;
+            if (jk[tot]<m) jk[++tot]=rd[i][2]+1;
+        }
+    }
+    sort(jk+1,jk+1+tot);
+    for (int i=1;i<=tot;i++){
+        if (jk[i]==jk[jk[0]]) continue;
+        jk[++jk[0]]=jk[i];
+    }
+    tot=jk[0];
+    m=tot;
+    for (int i=1;i<=n;i++){
+        int opt=rd[i][0];
+        if (opt==0){
+            int id,l,r,x;
+            rd[i][2]=lower_bound(jk+1,jk+1+tot,rd[i][2])-jk;
+            rd[i][3]=lower_bound(jk+1,jk+1+tot,rd[i][3])-jk;
+        }
+        if (opt==1){
+            int id,l,r;
+            rd[i][2]=lower_bound(jk+1,jk+1+tot,rd[i][2])-jk;
+            rd[i][3]=lower_bound(jk+1,jk+1+tot,rd[i][3])-jk;
+        }
+        if (opt==2){
+            int id,l,r;
+            rd[i][2]=lower_bound(jk+1,jk+1+tot,rd[i][2])-jk;
+            rd[i][3]=lower_bound(jk+1,jk+1+tot,rd[i][3])-jk;
+        }
+        if (opt==3){
+            rd[i][1]=lower_bound(jk+1,jk+1+tot,rd[i][1])-jk;
+        }
+    }
+    for (int i=1;i<=n;i++){
+        int opt;
+        opt=rd[i][0];
+        if (opt==0){
+            int id,l,r,x;
+            id=rd[i][1];
+            l=rd[i][2];
+            r=rd[i][3];
+            x=rd[i][4];
+            int pr=getr(l,r,id);
+            if (pr==0) {printf("-1\n"); continue;}
+            printf("%d\n",jk[pr]);
+            modify(rt,1,m,l,pr,id,x);
+        }
+        if (opt==1){
+            int id,l,r;
+            id=rd[i][1];
+            l=rd[i][2];
+            r=rd[i][3];
+            int ip=getid(rt,1,m,l,r);
+            int e=gete(rt,1,m,l,r);
+            if ((e==1)&&(ip==id)){
+                del(rt,1,m,l,r); printf("OK\n");
+            } else printf("FAIL\n");
+        }
+        if (opt==2){
+            int id,l,r;
+            id=rd[i][1];
+            l=rd[i][2];
+            r=rd[i][3];
+            int ip=getid(rt,1,m,l,r);
+            int e=gete(rt,1,m,l,r);
+            if ((e==0)&&(ip==id)){
+                reset(rt,1,m,l,r);printf("OK\n");
+            }else printf("FAIL\n");
+        }
+        if (opt==3){
+            int x;
+            x=rd[i][1];
+            int ans=query(rt,1,m,x);
+            if (ans==-19260817){printf("0 0\n"); continue;}
+            int id=getid(rt,1,m,x,x);
+            printf("%d %d\n",id,ans);
+        }
+    }
+    return 0;
+}
